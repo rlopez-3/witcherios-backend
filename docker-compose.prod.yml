@@ -1,0 +1,32 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce_redis_prod
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - ecommerce_prod_net
+
+  backend:
+    build:
+      context: .
+      target: production
+    container_name: ecommerce_backend_prod
+    restart: always
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env.production
+    depends_on:
+      - redis
+    networks:
+      - ecommerce_prod_net
+
+volumes:
+  redis_prod_data:
+
+networks:
+  ecommerce_prod_net:
+    driver: bridge

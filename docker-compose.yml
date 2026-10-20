@@ -1,0 +1,34 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - ecommerce_net
+
+  backend:
+    build:
+      context: .
+      target: development
+    container_name: ecommerce_backend_dev
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+    networks:
+      - ecommerce_net
+
+volumes:
+  redis_dev_data:
+
+networks:
+  ecommerce_net:
+    driver: bridge
